@@ -7,7 +7,7 @@ const port = 3000;
 
 app.use(express.json());
 
-app.get("/", (req, res) => res.send(`
+app.get("//", (req, res) => res.send(`
   <html>
     <head><title>Success!</title></head>
     <body>
