@@ -19,15 +19,32 @@ app.get("/", (req, res) => res.send(`
 
 app.post("/github", (req, res) => {
   const content = ":wave: Hi mom!";
-  const avatarUrl = "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif";
+  const avatarUrl = req.body.deployment_status.creator.avatar_url;
+  const state = req.body.deployment_status.state;
+  const repoName = req.body.repository.name;
+  const environment = req.body.deployment_status.environment;
+  const description = req.body.deployment_status.description;
+  
+  // Set color based on deployment state
+  let color = 0x00ff00; // Green for success
+  if (state === 'failure') {
+    color = 0xff0000; // Red for failure
+  } else if (state === 'pending') {
+    color = 0xffff00; // Yellow for pending
+  }
+  
   axios
     .post(process.env.DISCORD_WEBHOOK_URL, {
       content: content,
       embeds: [
         {
-          image: {
+          title: `Deployment ${state.toUpperCase()} - ${repoName}`,
+          description: `**Environment:** ${environment}\n**Status:** ${state}\n**Description:** ${description}`,
+          color: color,
+          thumbnail: {
             url: avatarUrl,
           },
+          url: req.body.deployment_status.target_url,
         },
       ],
     })
